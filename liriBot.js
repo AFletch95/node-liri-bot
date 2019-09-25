@@ -2,6 +2,7 @@
 const Spotify = require('node-spotify-api');
 const inquirer = require("inquirer");
 const axios = require("axios");
+const moment = require("moment");
 
 
 // Inquirer main menu
@@ -29,7 +30,8 @@ function main_menu() {
           break;
       case "Live band search":
           // TODO: Search bandsInTown api
-          console.log("bandsInTown Api");        
+          console.log("bandsInTown Api");
+          searchBandsinTown();        
           break;
     }
   })
@@ -135,5 +137,47 @@ function searchOmdbApi() {
 })
 }
 
+// search bands in town
+function searchBandsinTown() {
+  inquirer
+  .prompt([
+    {
+      type: "input",
+      message: "What would you like to search for?",
+      name: "userSearchTerm"
+    }
+  ])
+  .then(function(user) {
+    console.log(user.userSearchTerm)
+   let searchTerm = user.userSearchTerm;
 
+    let url = "https://rest.bandsintown.com/artists/" + searchTerm + "/events?app_id=codingbootcamp";
+
+    axios.get(url)
+    .then(function(response) {
+      let tourList = response.data;
+      if(tourList === '\n{warn=Not found}\n'){
+        console.log("No concerts found for ",searchTerm);
+        return;
+      }
+      else{
+      if(tourList.length > 5){
+        tourList.length = 5;
+      }
+      for(let i=0;i<tourList.length;i++){
+        let venue = tourList[i].venue;
+        let x = tourList[i];
+        console.log("Venue name: ",venue.name);
+        console.log("Venue location: ",venue.city,venue.region,venue.country);
+        let momentDateTime = moment(tourList[i].datetime).format("MM-DD-YYYY, HH:MM a");
+
+        console.log("Date and time",momentDateTime);
+        console.log("Line up: ",tourList[i].lineup)
+      }
+      
+    }
+    })
+  })
+  
+}
 main_menu();
