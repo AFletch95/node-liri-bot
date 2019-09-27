@@ -3,8 +3,6 @@ const Spotify = require('node-spotify-api');
 const inquirer = require("inquirer");
 const axios = require("axios");
 const moment = require("moment");
-require("dotenv").config();
-const keys = require("./keys.js");
 
 
 // Inquirer main menu
@@ -71,20 +69,15 @@ function searchSpotify() {
     if (user.userSearchTerm != ""){
       searchTerm = user.userSearchTerm.toLowerCase();}
 
-      var spotify = new Spotify({
-        id: keys.spotifyKeys.id,
-        secret: keys.spotifyKeys.secret
-      });
-
+    var spotify = new Spotify({
+      id: "1f9422099bf64dbb866280479ed9b1cc",
+      secret: "21e27afe3bde4d87b9b31aa76def69be"
+    });
     spotify.search({ type: 'track', query: searchTerm, limit: 1 }, function(err, data) {
       if (err) {
         return console.log('Error occurred: ' + err);
       }
-      console.log('\n');
-    console.log(data.tracks.items[0].name);
-    console.log("Album name: ",data.tracks.items[0].album.name);
-    console.log("By: ",data.tracks.items[0].album.artists[0].name);
-   console.log(data.tracks.items[0].external_urls.spotify); 
+    console.log(JSON.stringify(data.tracks.items[0].album.artists,null,2)); 
     });
   })
 }
@@ -111,7 +104,6 @@ function searchOmdbApi() {
 
   axios.get(queryUrl)
   .then(function(respose) {
-    console.log('\n');
     console.log(respose.data.Title);
     console.log(respose.data.Year);
     console.log(respose.data.Rated);
@@ -175,7 +167,6 @@ function searchBandsinTown() {
       for(let i=0;i<tourList.length;i++){
         let venue = tourList[i].venue;
         let x = tourList[i];
-        console.log('\n');
         console.log("Venue name: ",venue.name);
         console.log("Venue location: ",venue.city,venue.region,venue.country);
         let momentDateTime = moment(tourList[i].datetime).format("MM-DD-YYYY, HH:MM a");
